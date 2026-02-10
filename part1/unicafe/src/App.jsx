@@ -19,9 +19,13 @@ const App = () => {
             <Button onClick={() => setNeutral(neutral + 1)} text='neutral' />
             <Button onClick={() => setBad(bad + 1)} text='bad' />
             <h1>statistics</h1>
-            <p>good {good}</p>
-            <p>neutral {neutral}</p>
-            <p>bad {bad}</p>
+            <p>
+                good {good}<br />
+                neutral {neutral}<br />
+                bad {bad}<br />
+                average {(good - bad) / (good + neutral + bad)}<br />
+                positive {(good * 100) / (good + neutral + bad)}%
+            </p>
         </div>
     )
 }
