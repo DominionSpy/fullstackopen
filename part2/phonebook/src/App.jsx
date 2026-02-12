@@ -23,7 +23,16 @@ const App = () => {
     if (persons
       .map(person => person.name)
       .indexOf(newName) !== -1) {
-      alert(`${newName} is already added to phonebook`)
+      const personObject = persons.find(person => person.name === newName)
+      if (window.confirm(`${personObject.name} is already added to phonebook, replace the old number with a new one?`)) {
+        personService
+          .update(personObject.id, {...personObject, number: newNumber})
+          .then(returnedPerson => {
+            setPersons(persons.toSpliced(persons.indexOf(personObject), 1, returnedPerson))
+            setNewName('')
+            setNewNumber('')
+          })
+      }
       return
     }
     const personObject = {
