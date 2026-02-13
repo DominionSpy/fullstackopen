@@ -2,6 +2,9 @@ const express = require('express')
 const app = express()
 app.use(express.json())
 
+const morgan = require('morgan')
+app.use(morgan('tiny'))
+
 let persons = [
   {
     "id": "1",
@@ -59,7 +62,6 @@ const generateId = () => {
 }
 
 app.post('/api/persons', (request, response) => {
-  console.log(request.body.content)
   const body = request.body
 
   if (!body.name) {
