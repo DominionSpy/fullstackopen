@@ -1,4 +1,4 @@
-const Countries = ({ countries }) => {
+const Countries = ({ countries, onShowCountry }) => {
   if (countries.length === 0) {
     return (
       <div>No matches, specify another filter</div>
@@ -12,12 +12,15 @@ const Countries = ({ countries }) => {
   if (countries.length > 1) {
     return (
       <>
-        {countries.map(country => <div key={country.tld}>{country.name.common}</div>)}
+        {countries.map(country =>
+          <div key={country.name.common}>
+            {country.name.common}
+            <button onClick={onShowCountry} value={country.name.common}>Show</button>
+          </div>)}
       </>
     )
   }
   const country = countries[0]
-  console.log(Object.keys(country.languages))
   return (
     <>
       <h1>{country.name.common}</h1>
@@ -26,7 +29,9 @@ const Countries = ({ countries }) => {
       <h2>Languages</h2>
       <ul>
         {Object.keys(country.languages).map(language =>
-          <li key={language}>{country.languages[language]}</li>
+          <li key={language}>
+            {country.languages[language]}
+          </li>
         )}
       </ul>
       <img src={country.flags.png} alt='flag'/>

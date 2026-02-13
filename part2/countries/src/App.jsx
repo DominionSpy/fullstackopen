@@ -19,6 +19,10 @@ const App = () => {
     setCountryFilter(event.target.value)
   }
 
+  const showCountry = (event) => {
+    setCountryFilter(event.target.value)
+  }
+
   const countriesToShow = countryFilter === ''
     ? countries
     : countries.filter(country =>
@@ -28,7 +32,7 @@ const App = () => {
   return (
     <div>
       <Filter value={countryFilter} onChange={handleFilterChange} />
-      <Countries countries={countriesToShow} />
+      <Countries countries={countriesToShow} onShowCountry={showCountry} />
     </div>
   )
 }
