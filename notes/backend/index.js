@@ -2,8 +2,6 @@ const express = require('express')
 const app = express()
 app.use(express.static('dist'))
 app.use(express.json())
-const cors = require('cors')
-app.use(cors())
 
 let notes = [
   {
