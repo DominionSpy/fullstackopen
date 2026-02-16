@@ -12,9 +12,11 @@ morgan.token('body', request => {
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
 app.get('/info', (request, response) => {
-  const time = new Date()
-  response.send(`<p>Phonebook has info for ${persons.length} people</p>
+  Person.countDocuments({}).then(count => {
+    const time = new Date()
+    response.send(`<p>Phonebook has info for ${count} people</p>
     <p>${time}</p>`)
+  })
 })
 
 app.get('/api/persons', (request, response) => {
