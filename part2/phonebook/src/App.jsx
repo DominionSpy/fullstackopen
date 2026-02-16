@@ -80,6 +80,7 @@ const App = () => {
       personService
         .remove(personObject.id)
         .then(returnedPerson => {
+          console.log(returnedPerson)
           setPersons(persons.filter(person => person.id !== returnedPerson.id))
         })
         .catch(error => {

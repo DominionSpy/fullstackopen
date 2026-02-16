@@ -30,10 +30,14 @@ app.get('/api/persons/:id', (request, response) => {
 })
 
 app.delete('/api/persons/:id', (request, response) => {
-  const id = request.params.id
-  persons = persons.filter(person => person.id !== id)
-
-  response.status(204).end()
+  Person.findByIdAndDelete(request.params.id)
+    .then(person => {
+      response.status(204).json(person)
+    })
+    .catch(error => {
+      console.log(error)
+      response.status(400).send(error => console.log('malformatted id'))
+    })
 })
 
 app.post('/api/persons', (request, response) => {
@@ -60,7 +64,7 @@ app.post('/api/persons', (request, response) => {
   })
 })
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
