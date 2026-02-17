@@ -1,0 +1,9 @@
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+
+{
+  "title": "Le Fin Est Ici",
+  "author": "Matthew Wilson",
+  "url": "https://le-fin-est-ici.blogspot.com/",
+  "likes": 0
+}
