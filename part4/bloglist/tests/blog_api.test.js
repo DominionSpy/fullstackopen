@@ -85,7 +85,7 @@ test('a valid blog can be added', async () => {
     title: "Le Fin Est Ici",
     author: "Matthew Wilson",
     url: "https://le-fin-est-ici.blogspot.com/",
-    likes: 0,
+    likes: 5,
   }
 
   await api
@@ -125,6 +125,34 @@ test('blog added with no likes defaults to zero', async () => {
         throw new Error('blog likes should be zero')
       }
     })
+})
+
+test('blog added with no title returns an error', async () => {
+  const newBlog = {
+    author: "Matthew Wilson",
+    url: "https://le-fin-est-ici.blogspot.com/",
+    likes: 5,
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+    .expect(/Path `title` is required/)
+})
+
+test.only('blog added with no url returns an error', async () => {
+  const newBlog = {
+    title: "Le Fin Est Ici",
+    author: "Matthew Wilson",
+    likes: 5,
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+    .expect(/Path `url` is required/)
 })
 
 after(async () => {
