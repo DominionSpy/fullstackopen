@@ -18,19 +18,28 @@ const favoriteBlog = (blogs) => {
 }
 
 const mostBlogs = (blogs) => {
-  const max = _(blogs)
+  return _(blogs)
     .countBy("author")
     .entries()
-    .maxBy(1)
-  if (!max) {
-    return null
-  }
-  return {
-    author: max[0],
-    blogs: max[1],
-  }
+    .map(([author, blogs]) => ({
+      author: author,
+      blogs: blogs
+    }))
+    .orderBy("blogs", "desc")
+    .head()
+}
+
+const mostLikes = (blogs) => {
+  return _(blogs)
+    .groupBy("author")
+    .map(item => ({
+      author: item[0].author,
+      likes: item.reduce((total, blog) => total + blog.likes, 0)
+    }))
+    .orderBy("likes", "desc")
+    .head()
 }
 
 module.exports = {
-  dummy, totalLikes, favoriteBlog, mostBlogs
+  dummy, totalLikes, favoriteBlog, mostBlogs, mostLikes
 }
