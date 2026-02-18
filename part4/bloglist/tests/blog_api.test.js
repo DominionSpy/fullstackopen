@@ -93,7 +93,7 @@ describe('when there are initially some blogs saved', () => {
         .expect(/Path `title` is required/)
     })
 
-    test.only('with no url fails with status code 400', async () => {
+    test('with no url fails with status code 400', async () => {
       const newBlog = {
         title: "Le Fin Est Ici",
         author: "Matthew Wilson",
@@ -105,6 +105,39 @@ describe('when there are initially some blogs saved', () => {
         .send(newBlog)
         .expect(400)
         .expect(/Path `url` is required/)
+    })
+  })
+
+  describe('update of an existing blog', () => {
+    test('succeeds with status code 200 with valid data', async () => {
+      const blogsAtStart = await helper.blogsInDb()
+      const blogToUpdate = blogsAtStart[0]
+
+      await api
+        .put(`/api/blogs/${blogToUpdate.id}`)
+        .send({...blogToUpdate, likes: 20})
+        .expect(200)
+
+      const blogsAtEnd = await helper.blogsInDb()
+      const updatedBlog = blogsAtEnd.find(blog => blog.id === blogToUpdate.id)
+      assert.strictEqual(updatedBlog.likes, 20)
+      assert.strictEqual(blogsAtEnd.length, blogsAtStart.length)
+    })
+
+    test('fails with status code 404 if note does not exist', async () => {
+      const validNonexistingId = await helper.nonExistingId()
+
+      await api
+        .put(`/api/blogs${validNonexistingId}`)
+        .expect(404)
+    })
+
+    test('fails with status code 400 if id is invalid', async () => {
+      const invalidId = '5a3d5da59070081a82a3445'
+
+      await api
+        .put(`/api/blogs/${invalidId}`)
+        .expect(400)
     })
   })
 
