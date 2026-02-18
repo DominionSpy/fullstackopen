@@ -80,7 +80,7 @@ test('unique identifier is named id', async () => {
     })
 })
 
-test.only('a valid blog can be added', async () => {
+test('a valid blog can be added', async () => {
   const newBlog = {
     title: "Le Fin Est Ici",
     author: "Matthew Wilson",
@@ -102,6 +102,29 @@ test.only('a valid blog can be added', async () => {
       }
     })
     .expect(/Le Fin Est Ici/)
+})
+
+test('blog added with no likes defaults to zero', async () => {
+  const newBlog = {
+    title: "Le Fin Est Ici",
+    author: "Matthew Wilson",
+    url: "https://le-fin-est-ici.blogspot.com/",
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  await api
+    .get('/api/blogs')
+    .expect(res => {
+      const blog = res.body.find(blog => blog.author === newBlog.author)
+      if (blog.likes !== 0) {
+        throw new Error('blog likes should be zero')
+      }
+    })
 })
 
 after(async () => {
