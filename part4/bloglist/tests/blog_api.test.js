@@ -80,6 +80,30 @@ test('unique identifier is named id', async () => {
     })
 })
 
+test.only('a valid blog can be added', async () => {
+  const newBlog = {
+    title: "Le Fin Est Ici",
+    author: "Matthew Wilson",
+    url: "https://le-fin-est-ici.blogspot.com/",
+    likes: 0,
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  await api
+    .get('/api/blogs')
+    .expect(res => {
+      if (res.body.length !== initialBlogs.length + 1) {
+        throw new Error('blog not added')
+      }
+    })
+    .expect(/Le Fin Est Ici/)
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
