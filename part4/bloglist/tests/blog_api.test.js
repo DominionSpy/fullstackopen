@@ -4,12 +4,19 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 const helper = require('./test_helper')
+const User = require('../models/user')
 const Blog = require('../models/blog')
+const bcrypt = require("bcrypt");
 
 const api = supertest(app)
 
 describe('when there are initially some blogs saved', () => {
   beforeEach(async () => {
+    await User.deleteMany({})
+    const passwordHash = await bcrypt.hash('sekret', 10)
+    const user = new User({ username: 'root', passwordHash })
+    await user.save()
+
     await Blog.deleteMany({})
     await Blog.insertMany(helper.multipleBlogs)
   })
