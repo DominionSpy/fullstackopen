@@ -1,6 +1,23 @@
 const Blog = require('../models/blog')
 const User = require('../models/user')
 
+const multipleUsers = [
+  {
+    _id: '6996c8991a396bbc9ab2f2d3',
+    username: 'mluukkai',
+    name: 'Matti Luukkainen',
+    passwordHash: '$2b$10$Z3o1ZCt6KiZvso5EoiHc/u2K5gZDNJgCMzJVcC4r22rDGMvcj4nhS',
+    __v: 0
+  },
+  {
+    _id: '6996c83f25678b8519dbc73f',
+    username: 'hellas',
+    name: 'Arto Hellas',
+    passwordHash: '$2b$10$33jOShUcOFZt1ecdtBwjMOq6UFCRObCVVC/vdQ3M4Yv6WUyjVhA6q',
+    __v: 0
+  }
+]
+
 const noBlogs = []
 const oneBlog = [
   {
@@ -87,6 +104,7 @@ const usersInDb = async () => {
 }
 
 module.exports = {
+  multipleUsers,
   noBlogs,
   oneBlog,
   multipleBlogs,

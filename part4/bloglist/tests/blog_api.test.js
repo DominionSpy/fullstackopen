@@ -13,9 +13,7 @@ const api = supertest(app)
 describe('when there are initially some blogs saved', () => {
   beforeEach(async () => {
     await User.deleteMany({})
-    const passwordHash = await bcrypt.hash('sekret', 10)
-    const user = new User({ username: 'root', passwordHash })
-    await user.save()
+    await User.insertMany(helper.multipleUsers)
 
     await Blog.deleteMany({})
     await Blog.insertMany(helper.multipleBlogs)
@@ -40,6 +38,16 @@ describe('when there are initially some blogs saved', () => {
 
   describe('addition of a new blog', () => {
     test('succeeds with valid data', async () => {
+      const user = {
+        username: 'hellas',
+        password: 'password'
+      }
+
+      const response = await api
+        .post('/api/login')
+        .send(user)
+      const token = response.body.token
+
       const newBlog = {
         title: "Le Fin Est Ici",
         author: "Matthew Wilson",
@@ -49,6 +57,7 @@ describe('when there are initially some blogs saved', () => {
 
       await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -61,9 +70,53 @@ describe('when there are initially some blogs saved', () => {
           }
         })
         .expect(/Le Fin Est Ici/)
+        .expect(/Arto Hellas/)
+    })
+
+    test('fails with status code 401 if no token', async () => {
+      const newBlog = {
+        title: "Le Fin Est Ici",
+        author: "Matthew Wilson",
+        url: "https://le-fin-est-ici.blogspot.com/",
+        likes: 5,
+      }
+
+      await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(401)
+        .expect(/token invalid/)
+    })
+
+    test('fails with status code 401 if invalid token', async () => {
+      const token = 'invalid'
+
+      const newBlog = {
+        title: "Le Fin Est Ici",
+        author: "Matthew Wilson",
+        url: "https://le-fin-est-ici.blogspot.com/",
+        likes: 5,
+      }
+
+      await api
+        .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
+        .send(newBlog)
+        .expect(401)
+        .expect(/token invalid/)
     })
 
     test('with no likes defaults to zero', async () => {
+      const user = {
+        username: 'hellas',
+        password: 'password'
+      }
+
+      const response = await api
+        .post('/api/login')
+        .send(user)
+      const token = response.body.token
+
       const newBlog = {
         title: "Le Fin Est Ici",
         author: "Matthew Wilson",
@@ -72,6 +125,7 @@ describe('when there are initially some blogs saved', () => {
 
       await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -87,6 +141,16 @@ describe('when there are initially some blogs saved', () => {
     })
 
     test('with no title fails with status code 400', async () => {
+      const user = {
+        username: 'hellas',
+        password: 'password'
+      }
+
+      const response = await api
+        .post('/api/login')
+        .send(user)
+      const token = response.body.token
+
       const newBlog = {
         author: "Matthew Wilson",
         url: "https://le-fin-est-ici.blogspot.com/",
@@ -95,12 +159,23 @@ describe('when there are initially some blogs saved', () => {
 
       await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(newBlog)
         .expect(400)
         .expect(/Path `title` is required/)
     })
 
     test('with no url fails with status code 400', async () => {
+      const user = {
+        username: 'hellas',
+        password: 'password'
+      }
+
+      const response = await api
+        .post('/api/login')
+        .send(user)
+      const token = response.body.token
+
       const newBlog = {
         title: "Le Fin Est Ici",
         author: "Matthew Wilson",
@@ -109,6 +184,7 @@ describe('when there are initially some blogs saved', () => {
 
       await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(newBlog)
         .expect(400)
         .expect(/Path `url` is required/)
