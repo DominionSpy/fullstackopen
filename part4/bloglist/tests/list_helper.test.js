@@ -16,7 +16,7 @@ describe('total likes', () => {
     assert.strictEqual(result, 0)
   })
   test('when list has only one blog, equals the likes of that', () => {
-    const result = listHelper.totalLikes(helper.oneBlogs)
+    const result = listHelper.totalLikes(helper.oneBlog)
     assert.strictEqual(result, 5)
   })
   test('of a bigger list is counted right', () => {
@@ -31,8 +31,8 @@ describe('favorite blog', () => {
     assert.strictEqual(result, null)
   })
   test('when list has only one blog, equals that blog', () => {
-    const result = listHelper.favoriteBlog(helper.oneBlogs)
-    assert.deepStrictEqual(result, helper.oneBlogs[0])
+    const result = listHelper.favoriteBlog(helper.oneBlog)
+    assert.deepStrictEqual(result, helper.oneBlog[0])
   })
   test('of a bigger list is calculated right', () => {
     const result = listHelper.favoriteBlog(helper.multipleBlogs)
@@ -46,7 +46,7 @@ describe('most blogs', () => {
     assert.strictEqual(result, undefined)
   })
   test('when list has only one blog, equals that blog', () => {
-    const result = listHelper.mostBlogs(helper.oneBlogs)
+    const result = listHelper.mostBlogs(helper.oneBlog)
     assert.deepStrictEqual(result, {
       author: 'Edsger W. Dijkstra',
       blogs: 1,
@@ -67,7 +67,7 @@ describe('most likes', () => {
     assert.strictEqual(result, undefined)
   })
   test('when list has only one blog, equals that blog', () => {
-    const result = listHelper.mostLikes(helper.oneBlogs)
+    const result = listHelper.mostLikes(helper.oneBlog)
     assert.deepStrictEqual(result, {
       author: 'Edsger W. Dijkstra',
       likes: 5
