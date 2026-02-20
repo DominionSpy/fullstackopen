@@ -13,6 +13,7 @@ blogsRouter.get('/', async (request, response) => {
 
 blogsRouter.post('/', async (request, response) => {
   const { title, author, url, likes } = request.body
+
   const decodedToken = jwt.verify(request.token, process.env.SECRET)
   if (!decodedToken.id) {
     return response.status(401).json({ error: 'token invalid' })
@@ -20,7 +21,7 @@ blogsRouter.post('/', async (request, response) => {
   const user = await User.findById(decodedToken.id)
 
   if (!user) {
-    return response.status(500).json({ error: 'no users found' })
+    return response.status(400).json({ error: 'userId missing or not valid' })
   }
 
   const blog = new Blog({
@@ -44,7 +45,27 @@ blogsRouter.put('/:id', async (request, response) => {
 })
 
 blogsRouter.delete('/:id', async (request, response) => {
-  await Blog.findByIdAndDelete(request.params.id)
+  const decodedToken = jwt.verify(request.token, process.env.SECRET)
+  if (!decodedToken.id) {
+    return response.status(401).json({ error: 'token invalid' })
+  }
+  const user = await User.findById(decodedToken.id)
+
+  if (!user) {
+    return response.status(400).json({ error: 'userId missing or not valid' })
+  }
+
+  const returnedBlog = await Blog.findById(request.params.id)
+  console.log(returnedBlog)
+  if (!returnedBlog) {
+    return response.status(204).end()
+  }
+
+  if (user._id.toString() !== returnedBlog.user.toString()) {
+    return response.status(401).json({ error: 'user not authorized to delete this' })
+  }
+
+  await returnedBlog.deleteOne()
   response.status(204).end()
 })
 

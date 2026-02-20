@@ -6,7 +6,6 @@ const app = require('../app')
 const helper = require('./test_helper')
 const User = require('../models/user')
 const Blog = require('../models/blog')
-const bcrypt = require("bcrypt");
 
 const api = supertest(app)
 
@@ -38,15 +37,7 @@ describe('when there are initially some blogs saved', () => {
 
   describe('addition of a new blog', () => {
     test('succeeds with valid data', async () => {
-      const user = {
-        username: 'hellas',
-        password: 'password'
-      }
-
-      const response = await api
-        .post('/api/login')
-        .send(user)
-      const token = response.body.token
+      const token = await helper.loginToken(api)
 
       const newBlog = {
         title: "Le Fin Est Ici",
@@ -107,15 +98,7 @@ describe('when there are initially some blogs saved', () => {
     })
 
     test('with no likes defaults to zero', async () => {
-      const user = {
-        username: 'hellas',
-        password: 'password'
-      }
-
-      const response = await api
-        .post('/api/login')
-        .send(user)
-      const token = response.body.token
+      const token = await helper.loginToken(api)
 
       const newBlog = {
         title: "Le Fin Est Ici",
@@ -141,15 +124,7 @@ describe('when there are initially some blogs saved', () => {
     })
 
     test('with no title fails with status code 400', async () => {
-      const user = {
-        username: 'hellas',
-        password: 'password'
-      }
-
-      const response = await api
-        .post('/api/login')
-        .send(user)
-      const token = response.body.token
+      const token = await helper.loginToken(api)
 
       const newBlog = {
         author: "Matthew Wilson",
@@ -166,15 +141,7 @@ describe('when there are initially some blogs saved', () => {
     })
 
     test('with no url fails with status code 400', async () => {
-      const user = {
-        username: 'hellas',
-        password: 'password'
-      }
-
-      const response = await api
-        .post('/api/login')
-        .send(user)
-      const token = response.body.token
+      const token = await helper.loginToken(api)
 
       const newBlog = {
         title: "Le Fin Est Ici",
@@ -226,11 +193,14 @@ describe('when there are initially some blogs saved', () => {
 
   describe('deletion of a blog', () => {
     test('succeeds with status code 204 if id is valid', async () => {
+      const token = await helper.loginToken(api)
+
       const blogsAtStart = await helper.blogsInDb()
       const blogToDelete = blogsAtStart[0]
 
       await api
         .delete(`/api/blogs/${blogToDelete.id}`)
+        .set('Authorization', `Bearer ${token}`)
         .expect(204)
 
       const blogsAtEnd = await helper.blogsInDb()
@@ -240,10 +210,13 @@ describe('when there are initially some blogs saved', () => {
     })
 
     test('succeeds with status code 204 if blog does not exist', async () => {
+      const token = await helper.loginToken(api)
+
       const validNonexistingId = await helper.nonExistingId()
 
       await api
         .delete(`/api/blogs/${validNonexistingId}`)
+        .set('Authorization', `Bearer ${token}`)
         .expect(204)
 
       const blogsAtEnd = await helper.blogsInDb()
@@ -252,12 +225,60 @@ describe('when there are initially some blogs saved', () => {
       assert.strictEqual(blogsAtEnd.length, helper.multipleBlogs.length)
     })
 
-    test('fails with status code 400 if id is invalid', async () => {
+    test('fails with status code 401 if no token', async () => {
+      const blogsAtStart = await helper.blogsInDb()
+      const blogToDelete = blogsAtStart[0]
+
+      await api
+        .delete(`/api/blogs/${blogToDelete.id}`)
+        .expect(401)
+        .expect(/token invalid/)
+    })
+
+    test('fails with status code 401 if invalid token', async () => {
+      const token = 'invalid'
+
+      const blogsAtStart = await helper.blogsInDb()
+      const blogToDelete = blogsAtStart[0]
+
+      await api
+        .delete(`/api/blogs/${blogToDelete.id}`)
+        .set('Authorization', `Bearer ${token}`)
+        .expect(401)
+        .expect(/token invalid/)
+    })
+
+    test.skip('fails with status code 401 if incorrect user', async () => {
+      const user = {
+        username: 'mluukkai',
+        password: 'salainen'
+      }
+
+      const response = await api
+        .post('/api/login')
+        .send(user)
+      const token = response.body.token
+
+      const blogsAtStart = await helper.blogsInDb()
+      const blogToDelete = blogsAtStart[0]
+
+      await api
+        .delete(`/api/blogs/${blogToDelete.id}`)
+        .set('Authorization', `Bearer ${token}`)
+        .expect(401)
+        .expect(/not authorized/)
+    })
+
+    test('fails with status code 400 if id is malformed', async () => {
+      const token = await helper.loginToken(api)
+
       const invalidId = '5a3d5da59070081a82a3445'
 
       await api
         .delete(`/api/blogs/${invalidId}`)
+        .set('Authorization', `Bearer ${token}`)
         .expect(400)
+        .expect(/malformatted id/)
     })
   })
 })
