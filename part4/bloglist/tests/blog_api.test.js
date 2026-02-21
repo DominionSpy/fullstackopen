@@ -248,7 +248,7 @@ describe('when there are initially some blogs saved', () => {
         .expect(/token invalid/)
     })
 
-    test.skip('fails with status code 401 if incorrect user', async () => {
+    test('fails with status code 401 if incorrect user', async () => {
       const user = {
         username: 'mluukkai',
         password: 'salainen'
