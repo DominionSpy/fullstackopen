@@ -26,15 +26,34 @@ blogsRouter.post('/', userExtractor, async (request, response) => {
     user: user._id,
   })
 
-  const savedBlog = await blog.save()
+  const savedBlog = await Blog
+    .create(blog)
+  await savedBlog.populate('user', { username: 1, name: 1 })
   user.notes = user.notes.concat(savedBlog._id)
   await user.save()
 
   response.status(201).json(savedBlog)
 })
 
-blogsRouter.put('/:id', async (request, response) => {
-  const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, request.body)
+blogsRouter.put('/:id', userExtractor, async (request, response) => {
+  const { title, author, url, likes, user } = request.body
+
+  const requestUser = request.user
+  if (!requestUser) {
+    return response.status(400).json({ error: 'userId missing or not valid' })
+  }
+
+  const blog = {
+    title: title,
+    author: author,
+    url: url,
+    likes: likes,
+    user: user,
+  }
+
+  const updatedBlog = await Blog
+    .findByIdAndUpdate(request.params.id, blog, { returnDocument: 'after' })
+    .populate('user', { username: 1, name: 1 })
   response.json(updatedBlog)
 })
 
