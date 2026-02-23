@@ -5,6 +5,9 @@ import blogService from './services/blogs'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
+  const [newTitle, setNewTitle] = useState('')
+  const [newAuthor, setNewAuthor] = useState('')
+  const [newUrl, setNewUrl] = useState('')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
@@ -20,6 +23,7 @@ const App = () => {
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
+      blogService.setToken(user.token)
     }
   }, [])
 
@@ -34,6 +38,7 @@ const App = () => {
       window.localStorage.setItem(
         'loggedBlogappUser', JSON.stringify(user)
       )
+      blogService.setToken(user.token)
       setUser(user)
       setUsername('')
       setPassword('')
@@ -46,7 +51,24 @@ const App = () => {
     event.preventDefault()
 
     window.localStorage.removeItem('loggedBlogappUser')
+    blogService.setToken(null)
     setUser(null)
+  }
+
+  const addBlog = async event => {
+    event.preventDefault()
+
+    const blogObject = {
+      title: newTitle,
+      author: newAuthor,
+      url: newUrl,
+    }
+
+    const returnedBlog = await blogService.create(blogObject)
+    setBlogs(blogs.concat(returnedBlog))
+    setNewTitle('')
+    setNewAuthor('')
+    setNewUrl('')
   }
 
   const loginForm = () => (
@@ -75,6 +97,36 @@ const App = () => {
     </form>
   )
 
+  const newBlogForm = () => (
+    <form onSubmit={addBlog}>
+      <div>
+        <label>
+          title:
+          <input
+            value={newTitle}
+            onChange={({ target }) => setNewTitle(target.value)} />
+        </label>
+      </div>
+      <div>
+        <label>
+          author:
+          <input
+            value={newAuthor}
+            onChange={({ target }) => setNewAuthor(target.value)} />
+        </label>
+      </div>
+      <div>
+        <label>
+          url:
+          <input
+            value={newUrl}
+            onChange={({ target }) => setNewUrl(target.value)} />
+        </label>
+      </div>
+      <button type="submit">create</button>
+    </form>
+  )
+
   const blogList = () => (
     <>
       {blogs.map(blog =>
@@ -100,6 +152,8 @@ const App = () => {
              logout
             </button>
           </p>
+          <h2>create new</h2>
+          {newBlogForm()}
           {blogList()}
         </>
       )}
