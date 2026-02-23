@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react'
+import Notification from './components/Notification'
 import Blog from './components/Blog'
 import loginService from './services/login'
 import blogService from './services/blogs'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
+  const [notification, setNotification] = useState(null)
+  const [successful, setSuccessful] = useState(true)
   const [newTitle, setNewTitle] = useState('')
   const [newAuthor, setNewAuthor] = useState('')
   const [newUrl, setNewUrl] = useState('')
@@ -42,8 +45,17 @@ const App = () => {
       setUser(user)
       setUsername('')
       setPassword('')
+      setNotification(`user ${user.name} logged in`)
+      setTimeout(() => {
+        setNotification(null)
+      }, 5000)
     } catch {
-      console.log('wrong credentials')
+      setSuccessful(false)
+      setNotification('wrong username or password')
+      setTimeout(() => {
+        setNotification(null)
+        setSuccessful(true)
+      }, 5000)
     }
   }
 
@@ -53,6 +65,10 @@ const App = () => {
     window.localStorage.removeItem('loggedBlogappUser')
     blogService.setToken(null)
     setUser(null)
+    setNotification('user logged out')
+    setTimeout(() => {
+      setNotification(null)
+    }, 5000)
   }
 
   const addBlog = async event => {
@@ -69,6 +85,10 @@ const App = () => {
     setNewTitle('')
     setNewAuthor('')
     setNewUrl('')
+    setNotification(`a new blog ${returnedBlog.title} added`)
+    setTimeout(() => {
+      setNotification(null)
+    }, 5000)
   }
 
   const loginForm = () => (
@@ -140,12 +160,14 @@ const App = () => {
       {!user && (
         <>
           <h2>log in to application</h2>
+          <Notification message={notification} successful={successful} />
           {loginForm()}
         </>
       )}
       {user && (
         <>
           <h2>blogs</h2>
+          <Notification message={notification} successful={successful} />
           <p>
             {user.name} logged in
             <button onClick={handleLogout}>
