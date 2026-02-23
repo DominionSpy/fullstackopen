@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react'
+
+import Togglable from './components/Togglable'
 import Notification from './components/Notification'
 import Blog from './components/Blog'
+
 import loginService from './services/login'
 import blogService from './services/blogs'
 
@@ -118,33 +121,35 @@ const App = () => {
   )
 
   const newBlogForm = () => (
-    <form onSubmit={addBlog}>
-      <div>
-        <label>
-          title:
-          <input
-            value={newTitle}
-            onChange={({ target }) => setNewTitle(target.value)} />
-        </label>
-      </div>
-      <div>
-        <label>
-          author:
-          <input
-            value={newAuthor}
-            onChange={({ target }) => setNewAuthor(target.value)} />
-        </label>
-      </div>
-      <div>
-        <label>
-          url:
-          <input
-            value={newUrl}
-            onChange={({ target }) => setNewUrl(target.value)} />
-        </label>
-      </div>
-      <button type="submit">create</button>
-    </form>
+    <Togglable buttonLabel="create new blog">
+      <form onSubmit={addBlog}>
+        <div>
+          <label>
+            title:
+            <input
+              value={newTitle}
+              onChange={({ target }) => setNewTitle(target.value)} />
+          </label>
+        </div>
+        <div>
+          <label>
+            author:
+            <input
+              value={newAuthor}
+              onChange={({ target }) => setNewAuthor(target.value)} />
+          </label>
+        </div>
+        <div>
+          <label>
+            url:
+            <input
+              value={newUrl}
+              onChange={({ target }) => setNewUrl(target.value)} />
+          </label>
+        </div>
+        <button type="submit">create</button>
+      </form>
+    </Togglable>
   )
 
   const blogList = () => (
