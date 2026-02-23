@@ -83,11 +83,17 @@ const App = () => {
 
   const updateBlog = async (id, blogObject) => {
     const returnedBlog = await blogService.update(id, blogObject)
-    console.log(returnedBlog)
-    console.log(blogs)
     setBlogs(blogs.map(blog => blog.id === id ? returnedBlog : blog))
-    console.log(blogs)
     setNotification(`${returnedBlog.user.name} liked ${returnedBlog.title}`)
+    setTimeout(() => {
+      setNotification(null)
+    }, 5000)
+  }
+
+  const removeBlog = async (id) => {
+    await blogService.remove(id)
+    setBlogs(blogs.filter(blog => blog.id !== id))
+    setNotification(`blog removed`)
     setTimeout(() => {
       setNotification(null)
     }, 5000)
@@ -129,7 +135,13 @@ const App = () => {
     <>
       {blogs
         .sort((a, b) => b.likes - a.likes)
-        .map(blog => <Blog key={blog.id} blog={blog} updateBlog={updateBlog} />)
+        .map(blog => <Blog
+          key={blog.id}
+          blog={blog}
+          updateBlog={updateBlog}
+          removeBlog={removeBlog}
+          showRemove={user.username === blog.user.username}
+        />)
       }
     </>
   )
