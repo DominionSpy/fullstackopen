@@ -19,7 +19,7 @@ const App = () => {
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs )
-    )  
+    )
   }, [])
 
   useEffect(() => {
@@ -93,7 +93,7 @@ const App = () => {
   const removeBlog = async (id) => {
     await blogService.remove(id)
     setBlogs(blogs.filter(blog => blog.id !== id))
-    setNotification(`blog removed`)
+    setNotification('blog removed')
     setTimeout(() => {
       setNotification(null)
     }, 5000)
