@@ -1,9 +1,10 @@
 const { test, expect, beforeEach, describe } = require('@playwright/test')
+const { createBlog, loginWith } = require('./helper')
 
 describe('Blog app', () => {
   beforeEach(async ({ page, request }) => {
-    await request.post('http://localhost:5173/api/testing/reset')
-    await request.post('http://localhost:5173/api/users', {
+    await request.post('/api/testing/reset')
+    await request.post('/api/users', {
       data: {
         name: 'Matti Luukkainen',
         username: 'mluukkai',
@@ -11,7 +12,7 @@ describe('Blog app', () => {
       }
     })
 
-    await page.goto('http://localhost:5173')
+    await page.goto('/')
   })
 
   test('Login form is shown', async ({ page }) => {
@@ -23,19 +24,12 @@ describe('Blog app', () => {
 
   describe('Login', () => {
     test('succeeds with correct credentials', async ({ page }) => {
-      await page.getByRole('button', { name: 'login' }).click()
-      await page.getByLabel('username').fill('mluukkai')
-      await page.getByLabel('password').fill('salainen')
-      await page.getByRole('button', { name: 'login' }).click()
-
+      await loginWith(page, 'mluukkai', 'salainen')
       await expect(page.getByRole('button', { name: 'logout' })).toBeVisible()
     })
 
     test('fails with wrong credentials', async ({ page }) => {
-      await page.getByRole('button', { name: 'login' }).click()
-      await page.getByLabel('username').fill('mluukkai')
-      await page.getByLabel('password').fill('wrong')
-      await page.getByRole('button', { name: 'login' }).click()
+      await loginWith(page, 'mluukkai', 'wrong')
 
       const errorDiv = page.locator('.error')
       await expect(errorDiv).toContainText('wrong username or password')
@@ -43,6 +37,17 @@ describe('Blog app', () => {
       await expect(errorDiv).toHaveCSS('color', 'rgb(255, 0, 0)')
 
       await expect(page.getByRole('button', { name: 'logout' })).not.toBeVisible()
+    })
+  })
+
+  describe('when logged in', () => {
+    beforeEach(async ({ page }) => {
+      await loginWith(page, 'mluukkai', 'salainen')
+    })
+
+    test('a new blog can be created', async ({ page }) => {
+      await createBlog(page, 'test title', 'test author', 'https://test.com')
+      await expect(page.getByText('test author')).toBeVisible()
     })
   })
 })
