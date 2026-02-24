@@ -140,7 +140,7 @@ const App = () => {
           blog={blog}
           updateBlog={updateBlog}
           removeBlog={removeBlog}
-          showRemove={user.username === blog.user.username}
+          showRemove={user && (user.username === blog.user.username)}
         />)
       }
     </>
