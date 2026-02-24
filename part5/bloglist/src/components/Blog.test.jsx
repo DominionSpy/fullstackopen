@@ -50,7 +50,7 @@ describe('<Blog />', () => {
 
   test('clicking the like button twice calls event handler twice', async () => {
     const user = userEvent.setup()
-    const viewButton = screen.queryByText('view')
+    const viewButton = screen.getByText('view')
     await user.click(viewButton)
     const likeButton = screen.getByText('like')
     await user.click(likeButton)
