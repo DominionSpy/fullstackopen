@@ -3,6 +3,8 @@ import userEvent from '@testing-library/user-event'
 import Blog from './Blog'
 
 describe('<Blog />', () => {
+  const mockUpdateHandler = vi.fn()
+
   beforeEach(() => {
     const blog = {
       id: '123',
@@ -17,7 +19,7 @@ describe('<Blog />', () => {
       },
     }
     render(
-      <Blog blog={blog} />
+      <Blog blog={blog} updateBlog={mockUpdateHandler} />
     )
   })
 
@@ -44,5 +46,16 @@ describe('<Blog />', () => {
     expect(url).toBeVisible()
     const likes = screen.queryByText('likes 4', { exact: false })
     expect(likes).toBeVisible()
+  })
+
+  test('clicking the like button twice calls event handler twice', async () => {
+    const user = userEvent.setup()
+    const viewButton = screen.queryByText('view')
+    await user.click(viewButton)
+    const likeButton = screen.getByText('like')
+    await user.click(likeButton)
+    await user.click(likeButton)
+
+    expect(mockUpdateHandler.mock.calls).toHaveLength(2)
   })
 })
