@@ -91,7 +91,7 @@ describe('Blog app', () => {
         await createBlog(page, 'title three', 'author three', 'https://three.com')
       })
 
-      test.only('they are ordered by likes', async ({ page }) => {
+      test('they are ordered by likes', async ({ page }) => {
         await page.getByText('author one')
           .getByRole('button', { name: 'view' }).click()
         await page.getByText('author two')
