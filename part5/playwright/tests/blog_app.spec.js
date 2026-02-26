@@ -57,7 +57,7 @@ describe('Blog app', () => {
       await expect(page.getByText('test author')).toBeVisible()
     })
 
-    describe('add a blog exists', () => {
+    describe('and a blog exists', () => {
       beforeEach(async ({ page }) => {
         await createBlog(page, 'title one', 'author one', 'https://one.com')
       })
@@ -81,6 +81,59 @@ describe('Blog app', () => {
         await loginWith(page, 'hellas', 'password')
         await page.getByRole('button', { name: 'view' }).click()
         await expect(page.getByRole('button', { name: 'remove' })).not.toBeVisible()
+      })
+    })
+
+    describe('and several blogs exist', () => {
+      beforeEach(async ({ page }) => {
+        await createBlog(page, 'title one', 'author one', 'https://one.com')
+        await createBlog(page, 'title two', 'author two', 'https://two.com')
+        await createBlog(page, 'title three', 'author three', 'https://three.com')
+      })
+
+      test.only('they are ordered by likes', async ({ page }) => {
+        await page.getByText('author one')
+          .getByRole('button', { name: 'view' }).click()
+        await page.getByText('author two')
+          .getByRole('button', { name: 'view' }).click()
+        await page.getByText('author three')
+          .getByRole('button', { name: 'view' }).click()
+
+        await page.getByText('author one')
+          .getByRole('button', { name: 'like' })
+          .click()
+        await page.getByText('likes 1').waitFor()
+        await page.getByText('author one')
+          .getByRole('button', { name: 'like' })
+          .click()
+        await page.getByText('likes 2').waitFor()
+        await page.getByText('author two')
+          .getByRole('button', { name: 'like' })
+          .click()
+        await page.getByText('likes 1').waitFor()
+
+        let blogs = await page.getByText('likes').all()
+        await expect(blogs[0]).toContainText('author one')
+        await expect(blogs[1]).toContainText('author two')
+        await expect(blogs[2]).toContainText('author three')
+
+        await page.getByText('author three')
+          .getByRole('button', { name: 'like' })
+          .click()
+        await page.getByText('likes 1').nth(1).waitFor()
+        await page.getByText('author three')
+          .getByRole('button', { name: 'like' })
+          .click()
+        await page.getByText('likes 2').nth(1).waitFor()
+        await page.getByText('author three')
+          .getByRole('button', { name: 'like' })
+          .click()
+        await page.getByText('likes 3').waitFor()
+
+        blogs = await page.getByText('likes').all()
+        await expect(blogs[0]).toContainText('author three')
+        await expect(blogs[1]).toContainText('author one')
+        await expect(blogs[2]).toContainText('author two')
       })
     })
   })
