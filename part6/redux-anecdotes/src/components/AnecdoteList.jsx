@@ -16,7 +16,6 @@ const Anecdote = ({ anecdote, handleClick }) => {
 const AnecdoteList = () => {
   const dispatch = useDispatch()
   const anecdotes = useSelector(({ filter, anecdotes }) => {
-    console.log(anecdotes)
     if (filter === '') {
       return anecdotes
     }
