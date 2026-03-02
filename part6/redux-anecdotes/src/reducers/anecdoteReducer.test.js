@@ -3,25 +3,21 @@ import { describe, expect, test } from 'vitest'
 import anecdoteReducer from './anecdoteReducer'
 
 describe('anecdoteReducer', () => {
-  test('returns new state with action NEW_ANECDOTE', () => {
+  test('returns new state with action anecdotes/createAnecdote', () => {
     const state = []
     const action = {
-      type: 'NEW_ANECDOTE',
-      payload: {
-        content: 'But it works on my machine',
-        id: 1,
-        votes: 0
-      }
+      type: 'anecdotes/createAnecdote',
+      payload: 'But it works on my machine',
     }
 
     deepFreeze(state)
     const newState = anecdoteReducer(state, action)
 
     expect(newState).toHaveLength(1)
-    expect(newState).toContainEqual(action.payload)
+    expect(newState.map(anecdote => anecdote.content)).toContainEqual(action.payload)
   })
 
-  test('returns new state with action VOTE', () => {
+  test('returns new state with action anecdotes/addVote', () => {
     const state = [
       {
         content: 'But it works on my machine',
@@ -36,10 +32,8 @@ describe('anecdoteReducer', () => {
     ]
 
     const action = {
-      type: 'VOTE',
-      payload: {
-        id: 2
-      }
+      type: 'anecdotes/addVote',
+      payload: 2
     }
 
     deepFreeze(state)
