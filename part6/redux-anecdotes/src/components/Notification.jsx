@@ -7,9 +7,9 @@ const Notification = () => {
     borderWidth: 1,
     marginBottom: 10
   }
-  const notification = useSelector(({ notification }) => notification)
+  const message = useSelector(({ notification }) => notification)
 
-  return <div style={style}>{notification}</div>
+  return <div style={style}>{message}</div>
 }
 
 export default Notification
